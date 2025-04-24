@@ -5,13 +5,15 @@ from typing import Optional
 api_url = "https://search.basalam.com/ai-engine/api/v2.0/product/search"
 
 @tool
-def search_basalam(query: str, max_price: Optional[int] = None) -> list:
+def search_basalam(query: str, max_price: Optional[int] = None, min_rating: Optional[float] = None, vendor_city: Optional[str] = None) -> list:
     """
     جستجوی تمیز و مرتب محصولات از باسلام
     فقط اطلاعات مهم هر محصول را برمی‌گرداند و بر اساس قیمت مرتب می‌کند.
 
     :param query: عبارت جستجو (مثلاً "کفش")
     :param max_price: حداکثر قیمت به تومان (مثلاً 500000)
+    :param min_rating: حداقل امتیاز محصول (مثلاً 4.5)
+    :param vendor_city: شهر فروشنده (مثلاً "تهران")
     :return: لیستی از محصولات با اطلاعات تمیز
     """
     headers = {
@@ -49,8 +51,18 @@ def search_basalam(query: str, max_price: Optional[int] = None) -> list:
             "product_id": product.get("id"),
             "link": f"https://basalam.com/p/{product.get('id')}",
         }
-        if cleaned["price"]:  # فقط محصولاتی که قیمت دارند
-            cleaned_products.append(cleaned)
+        
+        # Apply filters
+        if not cleaned["price"]:  # Skip products without price
+            continue
+        
+        if min_rating and (not cleaned["rating"] or cleaned["rating"] < min_rating):
+            continue
+            
+        if vendor_city and cleaned["vendor_city"] and cleaned["vendor_city"].lower() != vendor_city.lower():
+            continue
+            
+        cleaned_products.append(cleaned)
 
     # مرتب‌سازی بر اساس قیمت
     sorted_products = sorted(cleaned_products, key=lambda x: x["price"])

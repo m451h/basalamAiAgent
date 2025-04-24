@@ -10,15 +10,15 @@ from langchain import hub
 
 
 load_dotenv()
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-os.environ["OPENAI_API_BASE"] = os.getenv("OPENAI_API_BASE")
+os.environ["OPENAI_API_KEY"] = os.getenv("AVALAI_API_KEY")
+os.environ["OPENAI_API_BASE"] = os.getenv("AVALAI_API_BASE")
 
 
 with open("prompts/base.txt", "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
 
-llm = init_chat_model("llama-3.3-70b-versatile", model_provider="openai")
+llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 llm_with_tools = llm.bind_tools([search_basalam])
 
 prompt = hub.pull("hwchase17/openai-tools-agent")

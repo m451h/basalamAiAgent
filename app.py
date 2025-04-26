@@ -91,7 +91,8 @@ if submit_button and user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     try:
-        response = get_agent_response(user_input)
+        with st.spinner("دستیار در حال فکر کردن است..."):
+            response = get_agent_response(user_input)
         st.session_state.messages.append({"role": "assistant", "content": response})
     except Exception as e:
         st.error(f"خطا در دریافت پاسخ: {str(e)}")

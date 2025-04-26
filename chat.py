@@ -1,4 +1,3 @@
-
 import os
 from operator import itemgetter
 from dotenv import load_dotenv
@@ -28,7 +27,17 @@ tools = [search_basalam]
 agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
+# Initialize chat history as a list
+chat_history = []
 
 def get_agent_response(user_input: str) -> str:
-    result = agent_executor.invoke({"input": user_input})
+    global chat_history
+    # Include chat history in the input
+    result = agent_executor.invoke({
+        "input": user_input,
+        "chat_history": chat_history
+    })
+    # Append the user input and agent response to the chat history
+    chat_history.append({"role": "user", "content": user_input})
+    chat_history.append({"role": "assistant", "content": result["output"]})
     return result["output"]

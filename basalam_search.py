@@ -26,7 +26,13 @@ def search_basalam(query: str, max_price: Optional[int] = None, min_rating: Opti
     }
 
     if max_price:
-        params["max_price"] = max_price
+        params["max_price"] = max_price * 10  # Convert to Rial
+
+    if min_rating:
+        params["min_rating"] = min_rating
+        
+    if vendor_city:
+        params["vendor_city"] = vendor_city
 
     response = requests.get(api_url, headers=headers, params=params)
 

@@ -7,6 +7,12 @@ Basalam AI Shopping Assistant is an **AI-powered conversational agent** designed
 You can try out a live demo of the Basalam AI Shopping Assistant at the following link:
 
 [Basalam AI Shopping Assistant Demo](https://basalamaiagent.onrender.com)
+
+## Testing Demo
+
+You can try out a live demo of the Basalam AI Shopping Assistant at the following link:
+
+[Basalam AI Shopping Assistant Demo](https://basalamaiagent.onrender.com)
 ![alt text](image.png)
 ## Features
 
@@ -60,6 +66,40 @@ Here are some examples of how you can interact with the AI agent:
 ## How It Works
 
 The AI agent processes user queries in Persian, extracts relevant parameters (e.g., product type, price range, city, rating), and uses the Basalam API to fetch matching products. It then formats the results into a structured and user-friendly response.
+
+## Chat History Feature
+
+The AI agent supports a **chat history** feature, allowing it to provide context-aware responses by remembering previous interactions in the conversation.
+
+### How It Works
+
+The `chat_history` stores the conversation as a sequence of messages. Each message includes:
+- `role`: Specifies whether the message is from the "user" or the "assistant".
+- `content`: The text of the message.
+
+This history is passed to the agent with each new query, enabling it to respond based on the context of the entire conversation.
+
+### Example
+
+1. **User Input**:
+    ```
+    گزینه‌های ارزان قیمت چیست؟
+    ```
+    **Agent Response**:
+    ```
+    گزینه‌های ارزان قیمت: محصول A (۱۰ دلار)، محصول B (۱۵ دلار)، محصول C (۲۰ دلار).
+    ```
+
+2. **Follow-Up Query**:
+    ```
+    کدام یکی از پیشنهادات شما ارزان‌تر است؟
+    ```
+    **Agent Response**:
+    ```
+    ارزان‌ترین گزینه محصول A است که قیمت آن ۱۰ دلار است.
+    ```
+
+In this example, the agent uses the chat history to understand the follow-up question and provide a relevant response.
 
 ## Project Structure
 

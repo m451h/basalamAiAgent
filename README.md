@@ -107,14 +107,18 @@ In this example, the agent uses the chat history to understand the follow-up que
 
 ```bash
 ├── app.py               # Streamlit frontend
-├── chat.py              # LangChain agent and logic
-├── basalam_search.py    # Tool for calling Basalam API
+├── chat.py             # LangChain agent and logic
+├── tools/              # Folder containing all tools
+│   ├── basalam_search.py    # Tool for calling Basalam API
+│   ├── generate_message.py  # Tool for generating seller messages
+│   └── intent_detector.py   # Tool for detecting user intent
 ├── prompts/
-│   └── base.txt         # Main system prompt for the assistant
-├── requirements.txt     # Python dependencies
-├── .env                 # API key environment variables (not committed)
-└── README.md            # Project documentation
+│   └── base.txt        # Main system prompt for the assistant
+├── requirements.txt    # Python dependencies
+├── .env               # API key environment variables (not committed)
+└── README.md          # Project documentation
 ```
+
 
 ## Setup Instructions
 

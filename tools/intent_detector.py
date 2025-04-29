@@ -6,23 +6,23 @@ from langchain_core.pydantic_v1 import BaseModel
 from typing import Literal
 from langchain.chat_models import init_chat_model
 
-# Load env
+
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("AVALAI_API_KEY")
 os.environ["OPENAI_API_BASE"] = os.getenv("AVALAI_API_BASE")
 
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
-# 🔹 تعریف ورودی ابزار
+
 class IntentInput(BaseModel):
     input: str
 
-# 🔹 تعریف خروجی ابزار
+
 class IntentOutput(BaseModel):
     intent: Literal["search_product", "contact_seller", "other"]
 
 
-# 🔹 ابزار تشخیص نیت
+
 @tool("detect_intent", return_direct=False, args_schema=IntentInput)
 def detect_intent(input: str) -> IntentOutput:
     """
@@ -50,7 +50,6 @@ def detect_intent(input: str) -> IntentOutput:
         return IntentOutput(intent="other")
 
 '''
-# ✅ برای تست مستقیم:
 if __name__ == "__main__":
     user_input = "برو از فروشنده بپرس کی می‌فرسته"
     result = detect_intent.invoke({"input": user_input})

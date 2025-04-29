@@ -33,7 +33,7 @@ tools = [search_basalam]
 agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
-# Initialize chat history as a list
+
 chat_history = []
 
 def get_agent_response(user_input: str) -> str:
@@ -43,9 +43,9 @@ def get_agent_response(user_input: str) -> str:
     intent = intent_result.intent
 
     if intent == "contact_seller":
-        # فرض بر این است که عنوان محصول مشخص است
+
         product_title = "عنوان محصول نمونه"
-        question = user_input  # در صورت نیاز، استخراج دقیق‌تر سوال انجام شود
+        question = user_input  
         message = generate_seller_message.invoke({
             "product_title": product_title,
             "question": question
@@ -54,7 +54,7 @@ def get_agent_response(user_input: str) -> str:
         return f"پیام برای فروشنده آماده شد ✅ (پیام: {message})"
 
     else:
-        # ادامه مسیر عادی ایجنت
+
         result = agent_executor.invoke({
             "input": user_input,
             "chat_history": chat_history

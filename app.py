@@ -83,9 +83,8 @@ for message in st.session_state.messages:
                                 st.markdown(f"[مشاهده محصول]({product_data['link']})")
         st.markdown("---")
 
-with st.form(key="user_input_form", clear_on_submit=True):
-    user_input = st.text_input("چه محصولی می‌خواهید؟ (مثال: «عسل از قم می‌خوام»)", "")
-    submit_button = st.form_submit_button("ارسال")
+user_input = st.chat_input("چه محصولی می‌خواهید؟ (مثال: «عسل از قم می‌خوام»)")
+submit_button = bool(user_input)
 
 if submit_button and user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})

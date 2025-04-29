@@ -1,7 +1,11 @@
 import os
 from operator import itemgetter
 from dotenv import load_dotenv
-from basalam_search import search_basalam
+
+from tools.basalam_search import search_basalam
+from tools.intent_detector import detect_intent
+from tools.generate_message import generate_seller_message
+ 
 
 from langchain.chat_models import init_chat_model
 from langchain.agents import AgentExecutor, create_tool_calling_agent
@@ -18,7 +22,9 @@ with open("prompts/base.txt", "r", encoding="utf-8") as f:
 
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
-llm_with_tools = llm.bind_tools([search_basalam])
+
+tools = [search_basalam, detect_intent, generate_seller_message]
+llm_with_tools = llm.bind_tools(tools)
 
 prompt = hub.pull("hwchase17/openai-tools-agent")
 prompt.messages[0].prompt.template = system_prompt
@@ -32,12 +38,27 @@ chat_history = []
 
 def get_agent_response(user_input: str) -> str:
     global chat_history
-    # Include chat history in the input
-    result = agent_executor.invoke({
-        "input": user_input,
-        "chat_history": chat_history
-    })
-    # Append the user input and agent response to the chat history
-    chat_history.append({"role": "user", "content": user_input})
-    chat_history.append({"role": "assistant", "content": result["output"]})
-    return result["output"]
+ # تشخیص نیت کاربر
+    intent_result = detect_intent.invoke({"input": user_input})
+    intent = intent_result.intent
+
+    if intent == "contact_seller":
+        # فرض بر این است که عنوان محصول مشخص است
+        product_title = "عنوان محصول نمونه"
+        question = user_input  # در صورت نیاز، استخراج دقیق‌تر سوال انجام شود
+        message = generate_seller_message.invoke({
+            "product_title": product_title,
+            "question": question
+        })
+        print("📩 پیام تولید‌شده برای فروشنده:\n", message)
+        return "پیام برای فروشنده آماده شد ✅"
+
+    else:
+        # ادامه مسیر عادی ایجنت
+        result = agent_executor.invoke({
+            "input": user_input,
+            "chat_history": chat_history
+        })
+        chat_history.append({"role": "user", "content": user_input})
+        chat_history.append({"role": "assistant", "content": result["output"]})
+        return result["output"]

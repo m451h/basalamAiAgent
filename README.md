@@ -2,11 +2,6 @@
 
 Basalam AI Shopping Assistant is an **AI-powered conversational agent** designed to assist Persian-speaking users in finding products on the Basalam marketplace. Unlike a traditional search engine, this agent uses **natural language understanding** to interpret user queries and provide personalized, structured responses. It leverages **LangChain** and **Large Language Models (LLMs)** to process conversational inputs and interact with the Basalam API for real-time product data.
 
-## Testing Demo
-
-You can try out a live demo of the Basalam AI Shopping Assistant at the following link:
-
-[Basalam AI Shopping Assistant Demo](https://basalamaiagent.onrender.com)
 
 ## Testing Demo
 

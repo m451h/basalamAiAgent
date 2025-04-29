@@ -49,9 +49,10 @@ def detect_intent(input: str) -> IntentOutput:
     else:
         return IntentOutput(intent="other")
 
-
+'''
 # ✅ برای تست مستقیم:
 if __name__ == "__main__":
     user_input = "برو از فروشنده بپرس کی می‌فرسته"
     result = detect_intent.invoke({"input": user_input})
     print(result)
+'''

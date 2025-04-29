@@ -8,7 +8,8 @@ Basalam AI Shopping Assistant is an **AI-powered conversational agent** designed
 You can try out a live demo of the Basalam AI Shopping Assistant at the following link:
 
 [Basalam AI Shopping Assistant Demo](https://basalamaiagent.onrender.com)
-![alt text](image.png)
+![alt text](image-1.png)
+
 ## Features
 
 - **Conversational AI**: Understands Persian-language queries, even if phrased casually or ambiguously.
@@ -57,6 +58,12 @@ Here are some examples of how you can interact with the AI agent:
     بهترین هدیه برای تولد زیر ۳۰۰ هزار تومان
     ```
     **Response**: Suggestions for birthday gifts priced below 300,000 Toman.
+
+4. **Messaging Sellers**:
+    ```
+    می‌خواهم به فروشنده پیام بدهم که آیا این محصول موجود است؟
+    ```
+    **Response**: The AI agent will return the message in the UI for now. This feature does not yet interact with the Basalam API but demonstrates how users can communicate with sellers.
 
 ## How It Works
 

@@ -26,7 +26,7 @@ with open("prompts/base.txt", "r", encoding="utf-8") as f:
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 
 tools = [search_basalam, detect_intent, generate_seller_message, fix_basalam_product_url, crawl_product_page]
-#llm_with_tools = llm.bind_tools(tools)
+llm_with_tools = llm.bind_tools(tools)
 
 prompt = hub.pull("hwchase17/openai-tools-agent")
 prompt.messages[0].prompt.template = system_prompt

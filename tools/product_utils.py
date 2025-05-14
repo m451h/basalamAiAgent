@@ -1,5 +1,7 @@
 import re
+from langchain_core.tools import tool
 
+@tool
 def fix_basalam_product_url(short_url: str, vendor_name: str) -> str:
     """
     Converts a short Basalam product URL (https://basalam.com/p/12345678)

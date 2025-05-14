@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from typing import Dict, Any
+from langchain_core.tools import tool
 
+@tool
 def crawl_product_page(url: str) -> Dict[str, Any]:
     """
     Crawls a Basalam product page and extracts the name, price, and description.

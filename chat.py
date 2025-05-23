@@ -73,3 +73,11 @@ def get_agent_response(user_input: str) -> str:
             print(details)  # Or collect these for further use
 
         return result["output"]
+
+    # Simple test
+if __name__ == "__main__":
+    test_input = "کیفی کمتر از ۵۰۰ هزار تومان"
+    response = get_agent_response(test_input)
+    print("Agent response:", response)
+
+

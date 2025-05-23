@@ -66,6 +66,9 @@ for message in st.session_state.messages:
                             product_data["link"] = line.replace("لینک:", "").strip()
                         elif line.startswith("تصویر:"):
                             product_data["image"] = line.replace("تصویر:", "").strip()
+                        elif line.startswith("توضیحات:"):
+                            product_data["description"] = line.replace("توضیحات:", "").strip()
+                            
 
                     if all(key in product_data for key in ["name", "price", "city", "link"]):
                         with st.expander(f"{product_data['name']} - {product_data['price']}"):

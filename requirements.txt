@@ -6,3 +6,4 @@ requests
 openai
 typing
 bs4
+langchain-core

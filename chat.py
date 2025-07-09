@@ -144,55 +144,48 @@ def get_agent_response(user_input: str) -> str:
                     comparison = compare_products(ids[:3])  # Max 3 products
                     return format_product_comparison(comparison)
 
-        # For search queries, directly call the search function
-        if any(keyword in user_input.lower() for keyword in ['جستجو', 'پیدا', 'کالا', 'محصول', 'خرید']):
-            try:
-                # Direct search approach
-                products = search_basalam(user_input)
+        # For any search-like query, always try to search
+        print(f"🔍 Searching for: {user_input}")
+        
+        try:
+            # Direct search approach - call the search function directly
+            from tools.basalam_search import search_basalam as search_func
+            products = search_func(user_input)
+            
+            print(f"🔍 Found {len(products)} products")
+            
+            if products:
+                # Format the response
+                response = f"🛍️ **نتایج جستجو برای '{user_input}':**\n\n"
                 
-                if products:
-                    # Format the response
-                    response = f"🛍️ **نتایج جستجو برای '{user_input}':**\n\n"
+                for i, product in enumerate(products[:10], 1):
+                    response += f"**{i}. {product.get('name', 'نامشخص')}**\n"
+                    response += f"• قیمت: {product.get('price', 0):,} تومان\n"
+                    response += f"• فروشنده: {product.get('vendor_name', 'نامشخص')}\n"
+                    response += f"• شهر: {product.get('vendor_city', 'نامشخص')}\n"
+                    if product.get('rating'):
+                        response += f"• امتیاز: {product.get('rating', 0)}/5\n"
+                    response += f"• [مشاهده محصول]({product.get('link', '')})\n\n"
+                
+                # Process and store products
+                print(f"🔄 پردازش و ذخیره {len(products)} محصول...")
+                stored_mapping = process_and_store_products(products, user_input)
+                
+                if stored_mapping:
+                    response += "\n💾 **محصولات ذخیره شدند!** برای مشاهده جزئیات بیشتر از این شناسه‌ها استفاده کنید:\n"
+                    for basalam_id, internal_id in stored_mapping.items():
+                        product_name = stored_products.get(internal_id, {}).get('name', 'نامشخص')
+                        response += f"• {product_name[:40]}...: `{internal_id}`\n"
                     
-                    for i, product in enumerate(products[:10], 1):
-                        response += f"**{i}. {product.get('name', 'نامشخص')}**\n"
-                        response += f"• قیمت: {product.get('price', 0):,} تومان\n"
-                        response += f"• فروشنده: {product.get('vendor_name', 'نامشخص')}\n"
-                        response += f"• شهر: {product.get('vendor_city', 'نامشخص')}\n"
-                        if product.get('rating'):
-                            response += f"• امتیاز: {product.get('rating', 0)}/5\n"
-                        response += f"• [مشاهده محصول]({product.get('link', '')})\n\n"
-                    
-                    # Process and store products
-                    print(f"🔄 پردازش و ذخیره {len(products)} محصول...")
-                    stored_mapping = process_and_store_products(products, user_input)
-                    
-                    if stored_mapping:
-                        response += "\n💾 **محصولات ذخیره شدند!** برای مشاهده جزئیات بیشتر از این شناسه‌ها استفاده کنید:\n"
-                        for basalam_id, internal_id in stored_mapping.items():
-                            product_name = stored_products.get(internal_id, {}).get('name', 'نامشخص')
-                            response += f"• {product_name[:40]}...: `{internal_id}`\n"
-                        
-                        response += f"\n**مثال:** «جزئیات محصول شناسه: {list(stored_mapping.values())[0]}»"
-                    
-                    return response
-                else:
-                    return "❌ متأسفانه محصولی با این مشخصات پیدا نشد. لطفاً عبارت جستجو را تغییر دهید."
-                    
-            except Exception as e:
-                print(f"❌ خطا در جستجو: {str(e)}")
-                return f"❌ خطا در جستجو: {str(e)}"
-        
-        # Use agent for other queries
-        result = agent_executor.invoke({
-            "input": user_input,
-            "chat_history": chat_history
-        })
-        
-        chat_history.append({"role": "user", "content": user_input})
-        chat_history.append({"role": "assistant", "content": result["output"]})
-        
-        return result["output"]
+                    response += f"\n**مثال:** «جزئیات محصول شناسه: {list(stored_mapping.values())[0]}»"
+                
+                return response
+            else:
+                return "❌ متأسفانه محصولی با این مشخصات پیدا نشد. لطفاً عبارت جستجو را تغییر دهید."
+                
+        except Exception as e:
+            print(f"❌ خطا در جستجو: {str(e)}")
+            return f"❌ خطا در جستجو: {str(e)}"
         
     except Exception as e:
         print(f"❌ خطا در پردازش درخواست: {str(e)}")

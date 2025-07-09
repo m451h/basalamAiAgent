@@ -16,9 +16,9 @@ from tools.product_manager import (
     compare_products
 )
 
-from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain import hub
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 load_dotenv()
 
@@ -37,7 +37,13 @@ if avalai_api_base:
 with open("prompts/base.txt", "r", encoding="utf-8") as f:
     system_prompt = f.read()
 
-llm = init_chat_model("gpt-4o-mini", model_provider="openai")
+# Initialize the LLM properly
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0,
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_API_BASE")
+)
 
 # Enhanced tools list with product management
 tools = [
@@ -54,13 +60,16 @@ tools = [
     compare_products
 ]
 
-llm_with_tools = llm.bind_tools(tools)
-
-prompt = hub.pull("hwchase17/openai-tools-agent")
-prompt.messages[0].prompt.template = system_prompt
+# Create a proper prompt template
+prompt = ChatPromptTemplate.from_messages([
+    ("system", system_prompt),
+    MessagesPlaceholder("chat_history", optional=True),
+    ("user", "{input}"),
+    MessagesPlaceholder("agent_scratchpad"),
+])
 
 agent = create_tool_calling_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 chat_history = []
 stored_products = {}  # Keep track of products by internal ID
@@ -113,20 +122,7 @@ def process_and_store_products(products: list, search_query: str = "") -> dict:
 def get_agent_response(user_input: str) -> str:
     global chat_history, stored_products
     
-    intent_result = detect_intent.invoke({"input": user_input})
-    intent = intent_result.intent
-
-    if intent == "contact_seller":
-        product_title = "عنوان محصول نمونه"
-        question = user_input  
-        message = generate_seller_message.invoke({
-            "product_title": product_title,
-            "question": question
-        })
-        print("📩 پیام تولید‌شده برای فروشنده:\n", message)
-        return f"پیام برای فروشنده آماده شد ✅ (پیام: {message})"
-
-    else:
+    try:
         # Check if user is asking about stored products
         if any(keyword in user_input.lower() for keyword in ['ذخیره', 'محصولات قبلی', 'جزئیات محصول', 'مقایسه']):
             # Handle stored product queries directly
@@ -148,7 +144,46 @@ def get_agent_response(user_input: str) -> str:
                     comparison = compare_products(ids[:3])  # Max 3 products
                     return format_product_comparison(comparison)
 
-        # Normal search and processing
+        # For search queries, directly call the search function
+        if any(keyword in user_input.lower() for keyword in ['جستجو', 'پیدا', 'کالا', 'محصول', 'خرید']):
+            try:
+                # Direct search approach
+                products = search_basalam(user_input)
+                
+                if products:
+                    # Format the response
+                    response = f"🛍️ **نتایج جستجو برای '{user_input}':**\n\n"
+                    
+                    for i, product in enumerate(products[:10], 1):
+                        response += f"**{i}. {product.get('name', 'نامشخص')}**\n"
+                        response += f"• قیمت: {product.get('price', 0):,} تومان\n"
+                        response += f"• فروشنده: {product.get('vendor_name', 'نامشخص')}\n"
+                        response += f"• شهر: {product.get('vendor_city', 'نامشخص')}\n"
+                        if product.get('rating'):
+                            response += f"• امتیاز: {product.get('rating', 0)}/5\n"
+                        response += f"• [مشاهده محصول]({product.get('link', '')})\n\n"
+                    
+                    # Process and store products
+                    print(f"🔄 پردازش و ذخیره {len(products)} محصول...")
+                    stored_mapping = process_and_store_products(products, user_input)
+                    
+                    if stored_mapping:
+                        response += "\n💾 **محصولات ذخیره شدند!** برای مشاهده جزئیات بیشتر از این شناسه‌ها استفاده کنید:\n"
+                        for basalam_id, internal_id in stored_mapping.items():
+                            product_name = stored_products.get(internal_id, {}).get('name', 'نامشخص')
+                            response += f"• {product_name[:40]}...: `{internal_id}`\n"
+                        
+                        response += f"\n**مثال:** «جزئیات محصول شناسه: {list(stored_mapping.values())[0]}»"
+                    
+                    return response
+                else:
+                    return "❌ متأسفانه محصولی با این مشخصات پیدا نشد. لطفاً عبارت جستجو را تغییر دهید."
+                    
+            except Exception as e:
+                print(f"❌ خطا در جستجو: {str(e)}")
+                return f"❌ خطا در جستجو: {str(e)}"
+        
+        # Use agent for other queries
         result = agent_executor.invoke({
             "input": user_input,
             "chat_history": chat_history
@@ -156,33 +191,12 @@ def get_agent_response(user_input: str) -> str:
         
         chat_history.append({"role": "user", "content": user_input})
         chat_history.append({"role": "assistant", "content": result["output"]})
-
-        # Check if the result contains products from search
-        if "نام کالا:" in result["output"] or "قیمت:" in result["output"]:
-            # Try to extract products from the agent's intermediate steps
-            try:
-                # Look for products in the agent's observation
-                for step in result.get("intermediate_steps", []):
-                    if isinstance(step, tuple) and len(step) >= 2:
-                        action, observation = step[0], step[1]
-                        if hasattr(action, 'tool') and action.tool == 'search_basalam':
-                            if isinstance(observation, list) and observation:
-                                print(f"🔄 پردازش و ذخیره {len(observation)} محصول...")
-                                stored_mapping = process_and_store_products(observation, user_input)
-                                
-                                if stored_mapping:
-                                    additional_info = "\n\n💾 محصولات ذخیره شدند! برای مشاهده جزئیات بیشتر از این شناسه‌ها استفاده کنید:\n"
-                                    for basalam_id, internal_id in stored_mapping.items():
-                                        product_name = stored_products.get(internal_id, {}).get('name', 'نامشخص')
-                                        additional_info += f"• {product_name}: `{internal_id}`\n"
-                                    
-                                    additional_info += "\nمثال: «جزئیات محصول شناسه: " + list(stored_mapping.values())[0] + "»"
-                                    result["output"] += additional_info
-                                break
-            except Exception as e:
-                print(f"❌ خطا در پردازش محصولات: {str(e)}")
-
+        
         return result["output"]
+        
+    except Exception as e:
+        print(f"❌ خطا در پردازش درخواست: {str(e)}")
+        return f"❌ متأسفم، مشکلی پیش آمد: {str(e)}"
 
 def format_detailed_product(product: dict) -> str:
     """Format detailed product information for display"""

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from langchain.tools import tool
 from langchain_core.pydantic_v1 import BaseModel
 from typing import Literal
-from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI
 
 
 load_dotenv()
@@ -22,7 +22,12 @@ if avalai_api_base:
     os.environ["OPENAI_API_BASE"] = avalai_api_base
 
 
-llm = init_chat_model("gpt-4o-mini", model_provider="openai")
+llm = ChatOpenAI(
+    model="gpt-4o-mini",
+    temperature=0,
+    api_key=os.environ.get("OPENAI_API_KEY"),
+    base_url=os.environ.get("OPENAI_API_BASE")
+)
 
 class IntentInput(BaseModel):
     input: str

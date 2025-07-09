@@ -8,8 +8,18 @@ from langchain.chat_models import init_chat_model
 
 
 load_dotenv()
-os.environ["OPENAI_API_KEY"] = os.getenv("AVALAI_API_KEY")
-os.environ["OPENAI_API_BASE"] = os.getenv("AVALAI_API_BASE")
+
+# Check if API key exists before setting it
+avalai_api_key = os.getenv("AVALAI_API_KEY")
+avalai_api_base = os.getenv("AVALAI_API_BASE")
+
+if avalai_api_key:
+    os.environ["OPENAI_API_KEY"] = avalai_api_key
+else:
+    raise ValueError("AVALAI_API_KEY environment variable is not set. Please add it to your .env file.")
+
+if avalai_api_base:
+    os.environ["OPENAI_API_BASE"] = avalai_api_base
 
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")

@@ -84,6 +84,10 @@ with st.sidebar:
     
     💾 **محصولات ذخیره شده:**
     "محصولات ذخیره شده من"
+    
+    🌱 **جستجوی اکولوژیک:**
+    "جستجوی اکولوژیک برای [مفهوم کلی]"
+    مثال: "جستجوی اکولوژیک برای V60 material"
     """)
 
 st.title("🛒 دستیار خرید هوشمند")
@@ -198,6 +202,17 @@ if st.session_state.get("show_advanced_search", False):
                 
                 if query_parts:
                     user_input = " ".join(query_parts)
+                    st.session_state.show_advanced_search = False
+            
+            if st.button("🌱 جستجوی اکولوژیک"):
+                if search_term:
+                    user_input = f"جستجوی اکولوژیک برای {search_term}"
+                    if max_price > 0:
+                        user_input += f" زیر {max_price:,} تومان"
+                    if min_rating > 0:
+                        user_input += f" امتیاز بالای {min_rating}"
+                    if vendor_city:
+                        user_input += f" از {vendor_city}"
                     st.session_state.show_advanced_search = False
 
 submit_button = bool(user_input)

@@ -15,6 +15,8 @@ from tools.product_manager import (
     get_recent_products,
     compare_products
 )
+from tools.eco_search import eco_search_expand
+from tools.eco_search_manager import perform_eco_search, explain_eco_search
 
 from langchain.chat_models import init_chat_model
 from langchain.agents import AgentExecutor, create_tool_calling_agent
@@ -29,7 +31,7 @@ with open("prompts/base.txt", "r", encoding="utf-8") as f:
 
 llm = init_chat_model("gpt-4o-mini", model_provider="openai")
 
-# Enhanced tools list with product management
+# Enhanced tools list with product management and Eco Search
 tools = [
     search_basalam, 
     detect_intent, 
@@ -41,7 +43,10 @@ tools = [
     get_product_details,
     search_saved_products,
     get_recent_products,
-    compare_products
+    compare_products,
+    eco_search_expand,
+    perform_eco_search,
+    explain_eco_search
 ]
 
 llm_with_tools = llm.bind_tools(tools)

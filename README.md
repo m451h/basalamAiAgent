@@ -17,6 +17,9 @@ You can try out a live demo of the Basalam AI Shopping Assistant at the followin
 - **Real-Time Data**: Fetches up-to-date product information from the Basalam marketplace.
 - **Structured Responses**: Displays product details like name, price, rating, seller info, and direct purchase links in a user-friendly format.
 - **Streamlit UI**: A clean and interactive web interface for seamless user interaction.
+- **Ecosystem Search**: Automatically finds related subcomponents and
+parts for general product queries.
+- **Product Fetch & Save**: Searched products are saved so users can revisit or compare them anytime.
 
 ## Example Queries
 
@@ -64,6 +67,18 @@ Here are some examples of how you can interact with the AI agent:
     می‌خواهم به فروشنده پیام بدهم که آیا این محصول موجود است؟
     ```
     **Response**: The AI agent will return the message in the UI for now. This feature does not yet interact with the Basalam API but demonstrates how users can communicate with sellers.
+
+5. **Ecosystem Search**:
+    ```
+    متریال V60
+    ```
+    **Response**: Returns a list of related components for V60, such as filters, dripper, server, and kettle.
+
+6. **Product Fetch & Save**:
+    ```
+    کفش مردانه زیر ۸۰۰ هزار تومان را ذخیره کن
+    ```
+    **Response**: Searched products are saved and can be viewed or compared later.
 
 ## How It Works
 

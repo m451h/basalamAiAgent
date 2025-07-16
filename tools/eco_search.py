@@ -20,11 +20,11 @@ class EcoSearchOutput(BaseModel):
     expanded_components: List[str]
     search_strategy: str
 
-@tool("concept_components_expand", return_direct=False, args_schema=EcoSearchInput)
-def concept_components_expand(query: str) -> EcoSearchOutput:
+@tool("eco_search_expand", return_direct=False, args_schema=EcoSearchInput)
+def eco_search_expand(query: str) -> EcoSearchOutput:
     """
-    شناسایی و استخراج اجزاء و لوازم مرتبط با یک مفهوم کلی.
-    این ابزار به طور هوشمند تمام قطعات و لوازم جانبی مرتبط با یک مفهوم را پیدا می‌کند.
+    تبدیل یک جستجوی کلی به جستجوی هوشمند که شامل اجزاء و قطعات مرتبط می‌شود.
+    این ابزار به طور هوشمند اجزاء مرتبط با یک مفهوم را شناسایی می‌کند.
     """
     prompt = f"""
     کاربر جستجوی زیر را وارد کرده است: "{query}"
@@ -93,7 +93,7 @@ def concept_components_expand(query: str) -> EcoSearchOutput:
 if __name__ == "__main__":
     # Test the tool
     test_query = "V60 material"
-    result = concept_components_expand.invoke({"query": test_query})
+    result = eco_search_expand.invoke({"query": test_query})
     print(f"جستجوی اصلی: {result.original_query}")
     print(f"اجزاء گسترده شده:")
     for component in result.expanded_components:

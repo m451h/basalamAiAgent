@@ -3,18 +3,18 @@ import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 from langchain.tools import tool
-from tools.eco_search import concept_components_expand
+from tools.eco_search import eco_search_expand
 from tools.basalam_search import search_basalam
 
-@tool("perform_intelligent_search", return_direct=False)
-def perform_intelligent_search(query: str, max_price: int = 0, min_rating: float = 0.0, vendor_city: str = "") -> Dict[str, Any]:
+@tool("perform_eco_search", return_direct=False)
+def perform_eco_search(query: str, max_price: int = 0, min_rating: float = 0.0, vendor_city: str = "") -> Dict[str, Any]:
     """
-    انجام جستجوی هوشمند که به طور خودکار اجزاء و لوازم مرتبط با یک مفهوم کلی را شناسایی و جستجو می‌کند.
+    انجام جستجوی هوشمند اکولوژیک که به طور خودکار اجزاء مرتبط را شناسایی و جستجو می‌کند.
     این ابزار جستجوی کلی را به جستجوهای تخصصی چندگانه تبدیل می‌کند.
     """
     try:
         # Step 1: Expand the query to find related components
-        expansion_result = concept_components_expand.invoke({"query": query})
+        expansion_result = eco_search_expand.invoke({"query": query})
         
         all_products = []
         search_results = {}
@@ -64,27 +64,27 @@ def perform_intelligent_search(query: str, max_price: int = 0, min_rating: float
             "search_results": search_results,
             "total_products": len(all_products),
             "products": all_products[:20],  # Limit to 20 products for display
-            "intelligent_search_summary": f"جستجوی هوشمند برای '{query}' انجام شد. {len(expansion_result.expanded_components)} جزء شناسایی و {len(all_products)} محصول یافت شد."
+            "eco_search_summary": f"جستجوی اکولوژیک برای '{query}' انجام شد. {len(expansion_result.expanded_components)} جزء شناسایی و {len(all_products)} محصول یافت شد."
         }
         
         return result
         
     except Exception as e:
         return {
-            "error": f"خطا در جستجوی هوشمند: {str(e)}",
+            "error": f"خطا در جستجوی اکولوژیک: {str(e)}",
             "original_query": query,
             "products": []
         }
 
-@tool("explain_intelligent_search", return_direct=False)
-def explain_intelligent_search(concept: str) -> str:
+@tool("explain_eco_search", return_direct=False)
+def explain_eco_search(concept: str) -> str:
     """
-    توضیح اینکه جستجوی هوشمند چگونه اجزاء و لوازم یک مفهوم کلی را شناسایی می‌کند.
+    توضیح اینکه جستجوی اکولوژیک چگونه یک مفهوم را گسترش می‌دهد.
     """
-    expansion_result = concept_components_expand.invoke({"query": concept})
+    expansion_result = eco_search_expand.invoke({"query": concept})
     
     explanation = f"""
-🧠 **جستجوی هوشمند برای "{concept}"**
+🌱 **جستجوی اکولوژیک برای "{concept}"**
 
 🎯 **مفهوم اصلی:** {concept}
 
@@ -107,8 +107,8 @@ def explain_intelligent_search(concept: str) -> str:
     return explanation
 
 if __name__ == "__main__":
-    # Test the intelligent search
-    test_result = perform_intelligent_search.invoke({"query": "V60 material"})
-    print("نتیجه جستجوی هوشمند:")
+    # Test the eco search
+    test_result = perform_eco_search.invoke({"query": "V60 material"})
+    print("نتیجه جستجوی اکولوژیک:")
     print(f"تعداد کل محصولات: {test_result.get('total_products', 0)}")
     print(f"اجزاء گسترده شده: {test_result.get('expanded_components', [])}")
